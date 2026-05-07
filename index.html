@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PawPal Adoption — Give Pets a Second Chance</title>
+  <meta name="description" content="Adopt a pet near you. PawPal Adoption connects loving families with dogs and cats seeking their forever homes — 100% free.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="header-container">
+      <div class="brand">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="brand-icon"><path d="M12 5c.67 0 1.35.09 2 .26 1.78-2 5.03-2.84 6.42-2.26 1.4.58-.42 4.18-1.5 5.86 1.83 2.11 2.87 4.97 2.87 8.01 0 5.4-4 9.13-9.79 9.13C6.21 26 2.22 22.27 2.22 16.87c0-3.04 1.04-5.9 2.87-8.01-1.08-1.68-2.9-5.28-1.5-5.86 1.39-.58 4.64.26 6.42 2.26.65-.17 1.33-.26 2-.26z"></path></svg>
+        PawPal
+      </div>
+      <nav class="nav-links" aria-label="Main navigation">
+        <button class="nav-btn active" data-view="home">Home</button>
+        <button class="nav-btn" data-view="details">Details</button>
+        <button class="nav-btn" data-view="add-pet">List a Pet</button>
+        <span class="user-greeting" id="userGreeting"></span>
+        <button class="auth-nav-btn" id="authNavBtn">Login</button>
+      </nav>
+    </div>
+  </header>
+
+<div class="app-shell">
+
+  <section class="hero home-extra">
+    <div class="hero-content">
+      <h1>Give pets a second chance at love.</h1>
+      <p>Discover nearby pets waiting for a forever home. Adopt, rescue, and make a difference today — completely free.</p>
+      <div class="hero-stats">
+        <div class="stat-pill"><strong id="statCount">12 pets</strong><span>Ready for adoption</span></div>
+        <div class="stat-pill"><strong>100% Free</strong><span>No adoption fees</span></div>
+        <div class="stat-pill"><strong>Verified</strong><span>Caregiver-listed</span></div>
+      </div>
+    </div>
+    <div class="hero-image">
+      <img src="https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&q=80&w=800" alt="Happy dog ready for adoption">
+    </div>
+  </section>
+
+  <div class="controls home-extra">
+    <div class="search-wrap">
+      <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+      <input id="searchInput" type="search" placeholder="Search by name or breed…" aria-label="Search pets">
+    </div>
+    <div class="filter-group" role="group" aria-label="Filter by type">
+      <button class="filter-btn active" data-filter="All">All <span class="filter-badge" id="badge-All">0</span></button>
+      <button class="filter-btn" data-filter="Dog">Dogs <span class="filter-badge" id="badge-Dog">0</span></button>
+      <button class="filter-btn" data-filter="Cat">Cats <span class="filter-badge" id="badge-Cat">0</span></button>
+    </div>
+  </div>
+
+  <section class="page active" id="view-home">
+    <div id="petGrid" class="pet-grid"></div>
+    <div class="empty-state hidden" id="noResults">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin: 0 auto 16px; color: var(--muted)"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+      <strong>No pets match your search.</strong>
+      <p>Try a different name, breed, or filter.</p>
+    </div>
+  </section>
+
+  <section class="page" id="view-add-pet">
+    <div class="form-panel">
+      <div class="form-header">
+        <h2>List a Pet for Adoption</h2>
+        <p>Fill in the details and your listing will appear on the home page instantly.</p>
+      </div>
+      <form id="addPetForm">
+        <div class="form-section-title">Pet Details</div>
+        <div class="form-grid">
+          <label>Pet Name <input id="petName" type="text" placeholder="e.g. Buddy"></label>
+          <label>Pet Type
+            <select id="petType" required>
+              <option value="Dog">Dog</option>
+              <option value="Cat">Cat</option>
+            </select>
+          </label>
+          <label>Breed <input id="petBreed" type="text" placeholder="e.g. Golden Retriever"></label>
+          <label>Age <input id="petAge" type="text" placeholder="e.g. 2 years" required></label>
+          <label>Gender
+            <select id="petGender" required>
+              <option value="Female">Female</option>
+              <option value="Male">Male</option>
+              <option value="Unknown">Unknown</option>
+            </select>
+          </label>
+          <label>Location <input id="petLocation" type="text" placeholder="e.g. Mumbai, Maharashtra"></label>
+        </div>
+        <label>Description <textarea id="petDescription" placeholder="What makes this pet special?" required></textarea></label>
+        <label>Upload Pet Image <input id="petImageFile" type="file" accept="image/*" class="file-input"></label>
+        
+        <div class="form-section-title" style="margin-top:24px">Your Contact Details</div>
+        <div class="form-grid">
+          <label>Your Name <input id="caregiverName" type="text" placeholder="Full name" required></label>
+          <label>Your Phone <input id="caregiverPhone" type="tel" placeholder="+91 98765 43210" required></label>
+          <label class="full-width">Your City / Address <input id="caregiverAddress" type="text" placeholder="Mumbai, Maharashtra" required></label>
+        </div>
+        
+        <div class="cta-row">
+          <button class="action-btn" type="submit">List for Adoption</button>
+          <button class="action-btn secondary" type="button" onclick="showView('home')">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <section class="adopt-section home-extra">
+    <div class="adopt-content">
+      <div class="adopt-label">PawPal Foundation</div>
+      <h2>#AdoptLove</h2>
+      <p>Approximately 1,478 dogs &amp; cats die every day on roads in India. PawPal is on a mission to help every stray find a caring home. Be part of this change — give them the life they deserve.</p>
+      <button class="adopt-btn" id="adoptPetBtn">Find a Pet to Adopt</button>
+    </div>
+  </section>
+
+  <section class="faq-section home-extra">
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-container">
+      <div class="faq-item">
+        <button class="faq-question">Why should you adopt a pet? <span class="faq-arrow">↓</span></button>
+        <div class="faq-answer"><div class="faq-answer-inner">Adopting a pet saves lives and gives animals a second chance at happiness. It reduces overcrowding in shelters and promotes responsible pet ownership.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question">Is there a fee to adopt? <span class="faq-arrow">↓</span></button>
+        <div class="faq-answer"><div class="faq-answer-inner">No, there is no fee for pet adoption on PawPal. However, if you adopt from a different city, the pet owner may ask for travel charges.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question">What is the minimum age to adopt? <span class="faq-arrow">↓</span></button>
+        <div class="faq-answer"><div class="faq-answer-inner">You must be at least 18 years old to adopt. If younger, your parents must be present and provide consent.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question">Can I return a pet? <span class="faq-arrow">↓</span></button>
+        <div class="faq-answer"><div class="faq-answer-inner">We understand adjustments can be hard. If you have a reasonable cause, you're welcome to put the pet up for adoption again on PawPal.</div></div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="site-footer home-extra">
+    <div class="footer-inner">
+      <div class="footer-title">PawPal Adoption</div>
+      <p class="footer-desc">Made with love for helping stray animals find caring homes.</p>
+      <div class="footer-meta">
+        <span>©️ 2026</span> • 
+        <span>Created by Fariha Shaikh</span> • 
+        <span>Final Year BCA Project</span>
+      </div>
+    </div>
+  </footer>
+
+</div><div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<div class="modal hidden" id="authModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h2 id="modalTitle">Welcome Back</h2>
+      <button class="modal-close" id="modalClose" aria-label="Close">✕</button>
+    </div>
+    <div class="modal-body">
+      <form id="authForm" class="auth-form">
+        <label id="nameField" style="display:none;">Full Name
+          <input id="authFullName" type="text" placeholder="Jane Doe">
+        </label>
+        <label>Email
+          <input id="authEmail" type="email" placeholder="your@email.com" required>
+        </label>
+        <label id="mobileField" style="display:none;">Mobile Number
+          <input id="authMobile" type="tel" placeholder="+91 98765 43210">
+        </label>
+        <label>Password
+          <input id="authPassword" type="password" placeholder="Minimum 6 characters" required>
+        </label>
+        <button class="action-btn full-width" type="submit" id="authSubmit">Login</button>
+      </form>
+      <p class="auth-toggle" id="authToggleCtr">Don't have an account? <a href="#" id="toggleAuthLink">Sign up</a></p>
+    </div>
+  </div>
+</div>
+
+<div class="modal hidden" id="detailsModal">
+  <div class="modal-box wide">
+    <div class="modal-header">
+      <h2 id="dm-name"></h2>
+      <button class="modal-close" id="detailsModalClose" aria-label="Close">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-content-grid">
+        <div class="modal-image-col">
+          <img id="dm-img" class="details-img" alt="Pet photo">
+          <div class="posted-badge">Listed on <span id="dm-posted"></span></div>
+        </div>
+        <div class="modal-info-col">
+          <div class="tags-row" id="dm-tags"></div>
+          <p id="dm-desc" class="pet-desc-text"></p>
+          
+          <div class="detail-grid">
+            <div class="detail-card">
+              <span class="lbl">Age</span>
+              <span class="val" id="dm-age"></span>
+            </div>
+            <div class="detail-card">
+              <span class="lbl">Gender</span>
+              <span class="val" id="dm-gender"></span>
+            </div>
+            <div class="detail-card">
+              <span class="lbl">Breed</span>
+              <span class="val" id="dm-breed"></span>
+            </div>
+            <div class="detail-card">
+              <span class="lbl">Location</span>
+              <span class="val" id="dm-loc"></span>
+            </div>
+          </div>
+
+          <div class="caregiver-card">
+            <h4>Contact Caregiver</h4>
+            <div class="cg-details">
+              <div class="cg-row"><span class="cg-lbl">Name</span><span id="dm-cg-name" class="cg-val">—</span></div>
+              <div class="cg-row"><span class="cg-lbl">Address</span><span id="dm-cg-address" class="cg-val">—</span></div>
+              <div class="cg-row">
+                <span class="cg-lbl">Phone</span>
+                <span class="cg-val">
+                  <button class="show-num-btn" id="showNumBtn">Show Number</button>
+                  <span id="dm-cg-phone" style="display:none;"></span>
+                </span>
+              </div>
+            </div>
+          </div>
+          
+          <button class="action-btn full-width" id="dm-adopt-btn">Contact Caregiver</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+<script src="app.js"></script>
+
+</body>
+</html>
