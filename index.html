@@ -3,87 +3,437 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PawPal Adoption — Give Pets a Second Chance</title>
-  <meta name="description" content="Adopt a pet near you. PawPal Adoption connects loving families with dogs and cats seeking their forever homes — 100% free.">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  <title>PawPal Adoption</title>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --surface: #ffffff;
+      --surface-strong: #f0f3ff;
+      --text: #1f2340;
+      --muted: #6b7280;
+      --brand: #5c6ac4;
+      --brand-soft: #e8ecff;
+      --success: #22c55e;
+      --shadow: 0 18px 45px rgba(54, 63, 146, 0.08);
+      --radius: 22px;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    .hidden { display: none !important; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(circle at top, rgba(92, 106, 196, 0.12), transparent 32%),
+        linear-gradient(180deg, #f9fbff 0%, #f5f7fb 100%);
+      color: var(--text);
+    }
+
+    .app-shell { max-width: 1180px; margin: 0 auto; padding: 24px 24px 40px; }
+
+    header.topbar {
+      display: flex; flex-wrap: wrap; justify-content: space-between;
+      align-items: center; gap: 16px; margin-bottom: 48px; position: relative; z-index: 1;
+    }
+
+    .brand { display: flex; align-items: center; gap: 12px; font-size: 1.45rem; font-weight: 700; }
+    .brand::before { content: '🐾'; font-size: 1.6rem; }
+
+    .nav-links { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+
+    button.nav-btn, button.control-btn, button.card-btn, button.action-btn {
+      border: none; cursor: pointer; border-radius: 999px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+    }
+
+    button.nav-btn { background: transparent; color: var(--muted); padding: 10px 18px; font-weight: 600; }
+    button.nav-btn.active, button.nav-btn:hover { color: var(--brand); background: rgba(92, 106, 196, 0.1); }
+
+    button.control-btn, button.card-btn, button.action-btn {
+      background: var(--brand); color: white; padding: 12px 18px;
+      font-weight: 700; box-shadow: 0 16px 32px rgba(92, 106, 196, 0.12);
+    }
+    button.control-btn:hover, button.card-btn:hover, button.action-btn:hover {
+      transform: translateY(-1px); box-shadow: 0 20px 35px rgba(92, 106, 196, 0.16);
+    }
+
+    .auth-nav-btn {
+      background: var(--brand); color: white; border: none; cursor: pointer;
+      border-radius: 999px; padding: 10px 20px; font-weight: 700; font-size: 0.95rem;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 8px 20px rgba(92, 106, 196, 0.2);
+    }
+    .auth-nav-btn:hover { transform: translateY(-1px); box-shadow: 0 12px 24px rgba(92, 106, 196, 0.28); }
+    .auth-nav-btn.logged-in { background: #eef3ff; color: var(--brand); box-shadow: none; }
+
+    .user-greeting { font-size: 0.9rem; color: var(--muted); font-weight: 500; display: none; }
+    .user-greeting.visible { display: block; }
+
+    .hero {
+      display: grid; grid-template-columns: 1.3fr 1fr; gap: 32px; align-items: center;
+      margin: 48px 0 32px; padding: 28px;
+      background: linear-gradient(135deg, #e8f4ff 0%, #f0f2ff 100%);
+      border-radius: var(--radius); box-shadow: 0 18px 45px rgba(92, 106, 196, 0.08);
+    }
+    .hero h1 { margin: 0 0 16px; font-size: clamp(2.2rem, 4vw, 3.4rem); line-height: 1.02; }
+    .hero p { max-width: 540px; line-height: 1.8; color: var(--muted); }
+    .hero .stats { margin-top: 24px; display: flex; flex-wrap: wrap; gap: 14px; }
+    .hero .stat { background: var(--brand-soft); padding: 14px 18px; border-radius: 16px; min-width: 144px; text-align: left; }
+    .hero .stat strong { display: block; font-size: 1.1rem; margin-bottom: 4px; }
+    .hero-image { display: grid; justify-content: center; }
+    .hero-image .hero-card {
+      width: 100%; max-width: 420px; min-height: 320px; border-radius: 28px;
+      background: linear-gradient(160deg, #dbe4ff 0%, #fefbff 100%);
+      box-shadow: var(--shadow); position: relative; overflow: hidden;
+    }
+    .hero-image .hero-card::before {
+      content: ''; position: absolute; top: -40px; right: -40px;
+      width: 220px; height: 220px; background: rgba(92, 106, 196, 0.18); border-radius: 50%;
+    }
+    .hero-image .hero-card img { width: 100%; height: 100%; object-fit: cover; border-radius: 28px; }
+
+    .controls { display: grid; gap: 18px; grid-template-columns: 1fr auto; margin-bottom: 24px; }
+    .search-group { display: grid; position: relative; }
+    .search-group input {
+      width: 100%; border: 1px solid #d8dde7; border-radius: 14px;
+      padding: 14px 18px; font-size: 1rem; color: var(--text);
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .search-group input:focus {
+      outline: none; border-color: rgba(92, 106, 196, 0.45);
+      box-shadow: 0 0 0 4px rgba(92, 106, 196, 0.08);
+    }
+    .filter-group { display: flex; flex-wrap: wrap; gap: 10px; justify-content: flex-end; }
+    .filter-group button {
+      background: transparent; color: var(--text); border: 1px solid #d8dde7;
+      padding: 12px 16px; border-radius: 999px; font-weight: 600; cursor: pointer; transition: all 0.2s ease;
+    }
+    .filter-group button.active, .filter-group button:hover {
+      background: var(--brand-soft); border-color: rgba(92, 106, 196, 0.24); color: var(--brand);
+    }
+
+    .filter-badge {
+      display: inline-flex; align-items: center; justify-content: center;
+      background: var(--brand); color: white; font-size: 0.75rem; font-weight: 700;
+      width: 20px; height: 20px; border-radius: 50%; margin-left: 6px;
+    }
+
+    .pet-grid { display: grid; gap: 24px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .pet-card {
+      background: var(--surface); border-radius: 26px; box-shadow: var(--shadow);
+      overflow: hidden; transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .pet-card:hover { transform: translateY(-4px); box-shadow: 0 24px 50px rgba(54, 63, 146, 0.12); }
+    .pet-card img { width: 100%; height: 210px; object-fit: cover; }
+    .pet-card .card-body { padding: 20px; }
+    .pet-card .pet-meta { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; color: var(--muted); font-size: 0.95rem; }
+    .pet-card h2 { margin: 0 0 12px; font-size: 1.25rem; }
+    .pet-card p { margin: 0 0 18px; line-height: 1.7; color: #4f566b; }
+
+    .posted-date { font-size: 0.8rem; color: var(--muted); margin-bottom: 10px; display: flex; align-items: center; gap: 5px; }
+
+    .detail-panel, .form-panel, .empty-state {
+      background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); padding: 28px; margin-top: 12px;
+    }
+    .page { display: none; animation: fadeIn 0.35s ease; }
+    .page.active { display: block; }
+
+    .pet-detail-list { display: grid; gap: 14px; margin: 22px 0; }
+    .pet-detail-list .item { display: grid; grid-template-columns: 130px 1fr; gap: 12px; color: var(--muted); }
+    .pet-detail-list .item span:first-child { font-weight: 700; color: var(--text); }
+
+    .pet-detail-badge { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; }
+    .pet-detail-badge .pill { background: #eef3ff; color: #2d3a7a; padding: 10px 14px; border-radius: 999px; font-size: 0.95rem; }
+
+    .form-panel form { display: grid; gap: 18px; }
+    .form-panel label { display: grid; gap: 8px; font-weight: 600; color: var(--text); }
+    .form-panel input, .form-panel textarea, .form-panel select {
+      width: 100%; border: 1px solid #d8dde7; border-radius: 16px;
+      padding: 14px 16px; font-size: 1rem; color: var(--text); background: #fff;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .form-panel input:focus, .form-panel textarea:focus, .form-panel select:focus {
+      outline: none; border-color: rgba(92, 106, 196, 0.45); box-shadow: 0 0 0 4px rgba(92, 106, 196, 0.08);
+    }
+    .form-panel textarea { min-height: 140px; resize: vertical; }
+
+    .cta-row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 24px; }
+
+    .note-banner {
+      padding: 18px 22px; border-radius: 20px; background: #eef8f4; border: 1px solid #d4efdd;
+      color: #205d45; display: flex; align-items: center; gap: 12px; margin-top: 12px;
+    }
+
+    .caregiver-card {
+      margin-top: 18px; background: #f8f9ff; border: 1px solid #e0e4f5;
+      border-radius: 20px; padding: 20px 22px;
+    }
+    .caregiver-card h3 { margin: 0 0 16px; font-size: 1.1rem; color: var(--text); font-weight: 700; display: flex; align-items: center; gap: 8px; }
+    .caregiver-row { display: grid; grid-template-columns: 90px 1fr; gap: 8px; margin-bottom: 10px; font-size: 0.95rem; }
+    .caregiver-row .label { font-weight: 700; color: var(--text); }
+    .caregiver-row .value { color: var(--muted); }
+    .show-number-btn {
+      background: none; border: none; color: var(--brand); font-weight: 700;
+      font-size: 0.95rem; cursor: pointer; padding: 0; text-decoration: underline; transition: color 0.2s;
+    }
+    .show-number-btn:hover { color: #3b4fa8; }
+
+    .posted-badge {
+      display: inline-flex; align-items: center; gap: 6px; background: #f0f3ff;
+      color: var(--brand); font-size: 0.82rem; font-weight: 600;
+      padding: 6px 12px; border-radius: 999px; margin-bottom: 14px;
+    }
+
+    .toast {
+      position: fixed; right: 24px; bottom: 24px; background: #1f2937; color: white;
+      border-radius: 18px; padding: 16px 20px; box-shadow: 0 18px 40px rgba(31, 41, 55, 0.2);
+      opacity: 0; transform: translateY(20px); transition: opacity 0.24s ease, transform 0.24s ease;
+      z-index: 20; max-width: 320px;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    .empty-state { text-align: center; color: var(--muted); }
+    .empty-state strong { display: block; margin-bottom: 10px; color: var(--text); }
+
+    .modal {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000;
+    }
+    .modal-content {
+      background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow);
+      width: 90%; max-width: 480px; max-height: 90vh; overflow-y: auto;
+    }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 20px; border-bottom: 1px solid #d8dde7; }
+    .modal-header h2 { margin: 0; }
+    .modal-close { background: none; border: none; font-size: 24px; cursor: pointer; color: var(--muted); }
+    .modal-body { padding: 20px; }
+    .auth-toggle { text-align: center; margin-top: 16px; color: var(--muted); }
+    .auth-toggle a { color: var(--brand); text-decoration: none; }
+
+    .adopt-love-hero {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: center;
+      margin: 48px 0 32px; padding: 28px;
+      background: linear-gradient(135deg, #f0e6ff 0%, #e8ecff 100%);
+      border-radius: var(--radius); box-shadow: 0 18px 45px rgba(92, 106, 196, 0.08);
+    }
+    .adopt-love-hero .left-side { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+    .adopt-love-hero .heart-icon { font-size: 4rem; color: #e91e63; }
+    .adopt-love-hero .foundation-text { text-align: center; font-weight: 700; color: var(--text); }
+    .adopt-love-hero .right-side { display: flex; flex-direction: column; gap: 16px; }
+    .adopt-love-hero h1 { margin: 0; font-size: clamp(3rem, 5vw, 4.5rem); line-height: 1.02; color: var(--brand); font-weight: 800; }
+    .adopt-love-hero p { line-height: 1.8; color: var(--muted); margin: 0; }
+    .adopt-love-hero .adopt-btn {
+      align-self: flex-start; background: var(--brand); color: white; padding: 12px 18px;
+      border: none; border-radius: 999px; font-weight: 700; cursor: pointer;
+      box-shadow: 0 16px 32px rgba(92, 106, 196, 0.12); transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .adopt-love-hero .adopt-btn:hover { transform: translateY(-1px); box-shadow: 0 20px 35px rgba(92, 106, 196, 0.16); }
+
+    .faq-section { margin: 48px 0 32px; padding: 28px; background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); }
+    .faq-section h2 { margin: 0 0 24px; font-size: 2rem; color: var(--text); }
+    .faq-item { border-bottom: 1px solid #d8dde7; }
+    .faq-item:last-child { border-bottom: none; }
+    .faq-question {
+      width: 100%; background: transparent; border: none; padding: 18px 0;
+      text-align: left; font-size: 1.1rem; font-weight: 600; color: var(--text);
+      cursor: pointer; display: flex; justify-content: space-between; align-items: center;
+    }
+    .faq-question::after { content: '+'; font-size: 1.5rem; color: var(--brand); transition: transform 0.2s ease; }
+    .faq-item.active .faq-question::after { transform: rotate(45deg); }
+    .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; padding: 0 0 18px; color: var(--muted); line-height: 1.7; }
+    .faq-item.active .faq-answer { max-height: 200px; }
+
+    .form-section-title {
+      font-size: 0.85rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.08em; color: var(--brand); padding: 4px 0 2px;
+      border-bottom: 1px solid #e0e4f5; margin-bottom: 4px;
+    }
+
+    /* ── Footer ── */
+    .site-footer {
+      margin-top: 64px;
+      background: linear-gradient(135deg, #3a4aa8 0%, #5c6ac4 55%, #7b8fd4 100%);
+      border-radius: 28px;
+      padding: 52px 40px 44px;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(58, 74, 168, 0.28);
+      position: relative;
+      overflow: hidden;
+    }
+    .site-footer::before, .site-footer::after {
+      content: ''; position: absolute; border-radius: 50%;
+      background: rgba(255,255,255,0.06);
+    }
+    .site-footer::before { width: 280px; height: 280px; top: -80px; left: -60px; }
+    .site-footer::after  { width: 200px; height: 200px; bottom: -60px; right: -40px; }
+    .footer-inner { position: relative; z-index: 1; }
+    .footer-paw {
+      font-size: 2.6rem; display: block; margin-bottom: 20px;
+      filter: drop-shadow(0 4px 12px rgba(0,0,0,0.15));
+    }
+    .footer-title {
+      font-size: 1.6rem; font-weight: 800; color: #ffffff;
+      margin: 0 0 6px; letter-spacing: 0.01em;
+    }
+    .footer-divider {
+      width: 48px; height: 3px; background: rgba(255,255,255,0.35);
+      border-radius: 999px; margin: 16px auto;
+    }
+    .footer-creator {
+      font-size: 1rem; font-weight: 600; color: rgba(255,255,255,0.95); margin: 0 0 6px;
+    }
+    .footer-project {
+      font-size: 0.88rem; font-weight: 500; color: rgba(255,255,255,0.7);
+      margin: 0 0 6px; letter-spacing: 0.04em; text-transform: uppercase;
+    }
+    .footer-desc {
+      font-size: 0.92rem; color: rgba(255,255,255,0.65); margin: 0 0 22px; line-height: 1.6;
+    }
+    .footer-tagline {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 999px; padding: 10px 22px;
+      font-size: 0.9rem; font-weight: 700; color: rgba(255,255,255,0.95); letter-spacing: 0.03em;
+    }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+    @media (max-width: 980px) {
+      .hero, .pet-grid, .adopt-love-hero { grid-template-columns: 1fr; }
+      .hero-image .hero-card { min-height: 260px; }
+    }
+    @media (max-width: 720px) {
+      .app-shell { padding: 18px 18px 30px; }
+      .controls { grid-template-columns: 1fr; }
+      .hero { padding: 22px; }
+      .pet-card img { height: 190px; }
+      .pet-card .card-body { padding: 18px; }
+      .pet-detail-list .item { grid-template-columns: 1fr; }
+      .pet-grid { grid-template-columns: 1fr; }
+      .caregiver-row { grid-template-columns: 80px 1fr; }
+      .site-footer { padding: 40px 24px 36px; border-radius: 20px; }
+      .footer-title { font-size: 1.3rem; }
+    }
+  </style>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
-
-  <header class="topbar">
-    <div class="header-container">
-      <div class="brand">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="brand-icon"><path d="M12 5c.67 0 1.35.09 2 .26 1.78-2 5.03-2.84 6.42-2.26 1.4.58-.42 4.18-1.5 5.86 1.83 2.11 2.87 4.97 2.87 8.01 0 5.4-4 9.13-9.79 9.13C6.21 26 2.22 22.27 2.22 16.87c0-3.04 1.04-5.9 2.87-8.01-1.08-1.68-2.9-5.28-1.5-5.86 1.39-.58 4.64.26 6.42 2.26.65-.17 1.33-.26 2-.26z"></path></svg>
-        PawPal
-      </div>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand">PawPal Adoption</div>
       <nav class="nav-links" aria-label="Main navigation">
         <button class="nav-btn active" data-view="home">Home</button>
         <button class="nav-btn" data-view="details">Details</button>
-        <button class="nav-btn" data-view="add-pet">List a Pet</button>
+        
+        <button class="nav-btn" data-view="add-pet">List Pet For Adoption</button>
         <span class="user-greeting" id="userGreeting"></span>
         <button class="auth-nav-btn" id="authNavBtn">Login</button>
       </nav>
-    </div>
-  </header>
+    </header>
 
-<div class="app-shell">
+    <section class="hero">
+      <div>
+        <h1>Give Pets a Second Chance at Love 𓃠</h1>
+        <p>Discover nearby pets waiting for a home. Adopt, rescue, and make a difference today.</p>
+        <div class="stats">
+          <div class="stat"><strong id="statCount">12 pets</strong>Ready for adoption</div>
+          <div class="stat"><strong>100% free</strong>No adoption fees</div>
+        </div>
+      </div>
+      <div class="hero-image">
+        <div class="hero-card">
+          <img src="https://tse1.mm.bing.net/th/id/OIP.ptcpBz6QgMYKKL1EA5ySZgHaLk?w=186&h=292&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3" alt="Hero pet">
+        </div>
+      </div>
+    </section>
 
-  <section class="hero home-extra">
-    <div class="hero-content">
-      <h1>Give pets a second chance at love.</h1>
-      <p>Discover nearby pets waiting for a forever home. Adopt, rescue, and make a difference today — completely free.</p>
-      <div class="hero-stats">
-        <div class="stat-pill"><strong id="statCount">12 pets</strong><span>Ready for adoption</span></div>
-        <div class="stat-pill"><strong>100% Free</strong><span>No adoption fees</span></div>
-        <div class="stat-pill"><strong>Verified</strong><span>Caregiver-listed</span></div>
+    <div class="controls">
+      <div class="search-group">
+        <input id="searchInput" type="search" placeholder="Search by name or breed" aria-label="Search pets">
+      </div>
+      <div class="filter-group" role="group" aria-label="Filter pets">
+        <button class="control-btn active" data-filter="All">All <span class="filter-badge" id="badge-All">0</span></button>
+        <button class="control-btn" data-filter="Dog">Dogs <span class="filter-badge" id="badge-Dog">0</span></button>
+        <button class="control-btn" data-filter="Cat">Cats <span class="filter-badge" id="badge-Cat">0</span></button>
       </div>
     </div>
-    <div class="hero-image">
-      <img src="https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&q=80&w=800" alt="Happy dog ready for adoption">
-    </div>
-  </section>
 
-  <div class="controls home-extra">
-    <div class="search-wrap">
-      <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-      <input id="searchInput" type="search" placeholder="Search by name or breed…" aria-label="Search pets">
-    </div>
-    <div class="filter-group" role="group" aria-label="Filter by type">
-      <button class="filter-btn active" data-filter="All">All <span class="filter-badge" id="badge-All">0</span></button>
-      <button class="filter-btn" data-filter="Dog">Dogs <span class="filter-badge" id="badge-Dog">0</span></button>
-      <button class="filter-btn" data-filter="Cat">Cats <span class="filter-badge" id="badge-Cat">0</span></button>
-    </div>
-  </div>
+    <section class="page page-home active" id="view-home">
+      <div id="petGrid" class="pet-grid"></div>
+      <div class="empty-state hidden" id="noResults">
+        <strong>No pets match your search.</strong>
+        Try a different name, breed, or filter.
+      </div>
+    </section>
 
-  <section class="page active" id="view-home">
-    <div id="petGrid" class="pet-grid"></div>
-    <div class="empty-state hidden" id="noResults">
-      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin: 0 auto 16px; color: var(--muted)"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-      <strong>No pets match your search.</strong>
-      <p>Try a different name, breed, or filter.</p>
-    </div>
-  </section>
+    <section class="adopt-love-hero">
+      <div class="left-side">
+        <div class="heart-icon">💗</div>
+        <div class="foundation-text">
+          <div>PawPal Foundation</div>
+          <div>Adopt, Don't Shop</div>
+        </div>
+      </div>
+      <div class="right-side">
+        <h1>#AdoptLove</h1>
+        <p>Approximately 1478 dogs & cats die every day on road in India. PawPal Adoption is on a mission to help every stray find a caring home. Be a part of this change and give them the life they deserve. So every pet finds love, safety and a home.</p>
+        <button class="adopt-btn" id="adoptPetBtn">Adopt a Pet</button>
+      </div>
+    </section>
 
-  <section class="page" id="view-add-pet">
-    <div class="form-panel">
-      <div class="form-header">
+    <section class="faq-section">
+      <h2>Frequently Asked Questions</h2>
+      <div class="faq-item">
+        <button class="faq-question">Why should you adopt a pet?</button>
+        <div class="faq-answer">Adopting a pet saves lives and gives animals a second chance at happiness. It reduces overcrowding in shelters and promotes responsible pet ownership. So what are you waiting for? Go find that perfect pet for home!</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question">What is the fee to adopt?</button>
+        <div class="faq-answer">No, there is no fee for pet adoption on PawPal. However, if you adopt from a different city, the pet owner/rescuer can ask for travel charges.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question">Minimum age to adopt?</button>
+        <div class="faq-answer">You need to be at least 18+ years old to adopt. If you're younger than 18, your parents must be with you and provide their consent.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question">Can you return a pet?</button>
+        <div class="faq-answer">We understand it can be hard to get an adjusted pet in the new home and vice versa. As long as your reason for returning is reasonable, you'll be welcome to put it up for adoption again.</div>
+      </div>
+    </section>
+
+    <!-- ── Premium Footer ── -->
+    <footer class="site-footer">
+      <div class="footer-inner">
+        <span class="footer-paw">🐾</span>
+        <h2 class="footer-title">PawPal Adoption</h2>
+        <div class="footer-divider"></div>
+        <p class="footer-creator">©️ 2026 &nbsp;•&nbsp; Created by Fariha Shaikh</p>
+        <p class="footer-project">Final Year BCA Project</p>
+        <p class="footer-desc">Made with love for helping stray animals find caring homes.</p>
+        <span class="footer-tagline">🐾 &nbsp;Adopt, Don't Shop</span>
+      </div>
+    </footer>
+
+
+
+    <section class="page page-add-pet" id="view-add-pet">
+      <div class="form-panel">
         <h2>List a Pet for Adoption</h2>
-        <p>Fill in the details and your listing will appear on the home page instantly.</p>
-      </div>
-      <form id="addPetForm">
-        <div class="form-section-title">Pet Details</div>
-        <div class="form-grid">
-          <label>Pet Name <input id="petName" type="text" placeholder="e.g. Buddy"></label>
+        <p style="color: var(--muted); margin-top: 8px;">Enter pet details below and publish the listing immediately.</p>
+        <form id="addPetForm">
+          <div class="form-section-title">🐾 Pet Details</div>
+          <label>Pet Name<input id="petName" type="text" placeholder="Buddy"></label>
           <label>Pet Type
             <select id="petType" required>
               <option value="Dog">Dog</option>
               <option value="Cat">Cat</option>
             </select>
           </label>
-          <label>Breed <input id="petBreed" type="text" placeholder="e.g. Golden Retriever"></label>
-          <label>Age <input id="petAge" type="text" placeholder="e.g. 2 years" required></label>
+          <label>Breed<input id="petBreed" type="text" placeholder="Golden Retriever"></label>
+          <label>Age<input id="petAge" type="text" placeholder="2 years" required></label>
           <label>Gender
             <select id="petGender" required>
               <option value="Female">Female</option>
@@ -91,160 +441,95 @@
               <option value="Unknown">Unknown</option>
             </select>
           </label>
-          <label>Location <input id="petLocation" type="text" placeholder="e.g. Mumbai, Maharashtra"></label>
+          <label>Location<input id="petLocation" type="text" placeholder="Mumbai, Maharashtra"></label>
+          <label>Description<textarea id="petDescription" placeholder="Share what makes this pet special." required></textarea></label>
+          <label>Upload Pet Image<input id="petImageFile" type="file" accept="image/*"></label>
+          <div class="form-section-title" style="margin-top: 8px;">👤 Your Contact Details</div>
+          <label>Your Name<input id="caregiverName" type="text" placeholder="Your full name" required></label>
+          <label>Your Phone Number<input id="caregiverPhone" type="tel" placeholder="+91 98765 43210" required></label>
+          <label>Your City / Address<input id="caregiverAddress" type="text" placeholder="Mumbai, Maharashtra, India" required></label>
+          <button class="action-btn" type="submit">Add for Adoption</button>
+        </form>
+      </div>
+    </section>
+  </div>
+
+  <div class="toast" id="toastMessage" role="status" aria-live="polite"></div>
+
+  <!-- Auth Modal -->
+  <div class="modal hidden" id="authModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="modalTitle">Login</h2>
+        <button class="modal-close" id="modalClose">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="authForm" style="display:grid;gap:18px;">
+          <label id="signupNameField" style="display:none;gap:8px;font-weight:600;">Full Name
+            <input id="authFullName" type="text" placeholder="Jane Doe" style="border:1px solid #d8dde7;border-radius:16px;padding:14px 16px;font-size:1rem;width:100%;">
+          </label>
+          <label style="display:grid;gap:8px;font-weight:600;">Email
+            <input id="authEmail" type="email" placeholder="your@email.com" required style="border:1px solid #d8dde7;border-radius:16px;padding:14px 16px;font-size:1rem;">
+          </label>
+          <label id="signupMobileField" style="display:none;gap:8px;font-weight:600;">Mobile Number
+            <input id="authMobile" type="tel" placeholder="+91 98765 43210" style="border:1px solid #d8dde7;border-radius:16px;padding:14px 16px;font-size:1rem;width:100%;">
+          </label>
+          <label style="display:grid;gap:8px;font-weight:600;" id="passwordLabel">Password
+            <input id="authPassword" type="password" placeholder="Password" required style="border:1px solid #d8dde7;border-radius:16px;padding:14px 16px;font-size:1rem;">
+          </label>
+          <button class="action-btn" type="submit" id="authSubmit">Login</button>
+        </form>
+        <p class="auth-toggle">Don't have an account? <a href="#" id="toggleAuth">Sign up</a></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pet Details Modal -->
+  <div class="modal hidden" id="detailsModal">
+    <div class="modal-content" style="max-width:600px;">
+      <div class="modal-header">
+        <h2 id="detailsModalName"></h2>
+        <button class="modal-close" id="detailsModalClose">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="detailsPostedBadge" class="posted-badge">📅 <span id="detailsPostedDate"></span></div>
+        <img id="detailsModalImage" alt="Selected pet image" style="width:100%;border-radius:20px;object-fit:cover;max-height:280px;margin-bottom:16px;">
+        <div class="pet-detail-badge" id="detailsModalBadges"></div>
+        <div class="note-banner" style="margin-top:14px;">
+          <span>💚</span>
+          <div>All pets are healthy, vaccinated, and ready for a loving home.</div>
         </div>
-        <label>Description <textarea id="petDescription" placeholder="What makes this pet special?" required></textarea></label>
-        <label>Upload Pet Image <input id="petImageFile" type="file" accept="image/*" class="file-input"></label>
-        
-        <div class="form-section-title" style="margin-top:24px">Your Contact Details</div>
-        <div class="form-grid">
-          <label>Your Name <input id="caregiverName" type="text" placeholder="Full name" required></label>
-          <label>Your Phone <input id="caregiverPhone" type="tel" placeholder="+91 98765 43210" required></label>
-          <label class="full-width">Your City / Address <input id="caregiverAddress" type="text" placeholder="Mumbai, Maharashtra" required></label>
+        <p id="detailsModalDescription" style="margin-top:16px;line-height:1.7;color:#4f566b;"></p>
+        <div class="pet-detail-list">
+          <div class="item"><span>Age</span><span id="detailsModalAge"></span></div>
+          <div class="item"><span>Gender</span><span id="detailsModalGender"></span></div>
+          <div class="item"><span>Breed</span><span id="detailsModalBreed"></span></div>
         </div>
-        
+        <div class="caregiver-card">
+          <h3>👤 Contact the Caregiver</h3>
+          <div class="caregiver-row">
+            <span class="label">Name</span>
+            <span class="value" id="caregiverModalName">—</span>
+          </div>
+          <div class="caregiver-row">
+            <span class="label">Address</span>
+            <span class="value" id="caregiverModalAddress">—</span>
+          </div>
+          <div class="caregiver-row">
+            <span class="label">Phone</span>
+            <span class="value">
+              <button class="show-number-btn" id="showNumberBtn">Show Number</button>
+              <span id="caregiverModalPhone" style="display:none;font-weight:600;color:var(--text);"></span>
+            </span>
+          </div>
+        </div>
         <div class="cta-row">
-          <button class="action-btn" type="submit">List for Adoption</button>
-          <button class="action-btn secondary" type="button" onclick="showView('home')">Cancel</button>
-        </div>
-      </form>
-    </div>
-  </section>
-
-  <section class="adopt-section home-extra">
-    <div class="adopt-content">
-      <div class="adopt-label">PawPal Foundation</div>
-      <h2>#AdoptLove</h2>
-      <p>Approximately 1,478 dogs &amp; cats die every day on roads in India. PawPal is on a mission to help every stray find a caring home. Be part of this change — give them the life they deserve.</p>
-      <button class="adopt-btn" id="adoptPetBtn">Find a Pet to Adopt</button>
-    </div>
-  </section>
-
-  <section class="faq-section home-extra">
-    <h2>Frequently Asked Questions</h2>
-    <div class="faq-container">
-      <div class="faq-item">
-        <button class="faq-question">Why should you adopt a pet? <span class="faq-arrow">↓</span></button>
-        <div class="faq-answer"><div class="faq-answer-inner">Adopting a pet saves lives and gives animals a second chance at happiness. It reduces overcrowding in shelters and promotes responsible pet ownership.</div></div>
-      </div>
-      <div class="faq-item">
-        <button class="faq-question">Is there a fee to adopt? <span class="faq-arrow">↓</span></button>
-        <div class="faq-answer"><div class="faq-answer-inner">No, there is no fee for pet adoption on PawPal. However, if you adopt from a different city, the pet owner may ask for travel charges.</div></div>
-      </div>
-      <div class="faq-item">
-        <button class="faq-question">What is the minimum age to adopt? <span class="faq-arrow">↓</span></button>
-        <div class="faq-answer"><div class="faq-answer-inner">You must be at least 18 years old to adopt. If younger, your parents must be present and provide consent.</div></div>
-      </div>
-      <div class="faq-item">
-        <button class="faq-question">Can I return a pet? <span class="faq-arrow">↓</span></button>
-        <div class="faq-answer"><div class="faq-answer-inner">We understand adjustments can be hard. If you have a reasonable cause, you're welcome to put the pet up for adoption again on PawPal.</div></div>
-      </div>
-    </div>
-  </section>
-
-  <footer class="site-footer home-extra">
-    <div class="footer-inner">
-      <div class="footer-title">PawPal Adoption</div>
-      <p class="footer-desc">Made with love for helping stray animals find caring homes.</p>
-      <div class="footer-meta">
-        <span>©️ 2026</span> • 
-        <span>Created by Fariha Shaikh</span> • 
-        <span>Final Year BCA Project</span>
-      </div>
-    </div>
-  </footer>
-
-</div><div class="toast" id="toast" role="status" aria-live="polite"></div>
-
-<div class="modal hidden" id="authModal">
-  <div class="modal-box">
-    <div class="modal-header">
-      <h2 id="modalTitle">Welcome Back</h2>
-      <button class="modal-close" id="modalClose" aria-label="Close">✕</button>
-    </div>
-    <div class="modal-body">
-      <form id="authForm" class="auth-form">
-        <label id="nameField" style="display:none;">Full Name
-          <input id="authFullName" type="text" placeholder="Jane Doe">
-        </label>
-        <label>Email
-          <input id="authEmail" type="email" placeholder="your@email.com" required>
-        </label>
-        <label id="mobileField" style="display:none;">Mobile Number
-          <input id="authMobile" type="tel" placeholder="+91 98765 43210">
-        </label>
-        <label>Password
-          <input id="authPassword" type="password" placeholder="Minimum 6 characters" required>
-        </label>
-        <button class="action-btn full-width" type="submit" id="authSubmit">Login</button>
-      </form>
-      <p class="auth-toggle" id="authToggleCtr">Don't have an account? <a href="#" id="toggleAuthLink">Sign up</a></p>
-    </div>
-  </div>
-</div>
-
-<div class="modal hidden" id="detailsModal">
-  <div class="modal-box wide">
-    <div class="modal-header">
-      <h2 id="dm-name"></h2>
-      <button class="modal-close" id="detailsModalClose" aria-label="Close">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="modal-content-grid">
-        <div class="modal-image-col">
-          <img id="dm-img" class="details-img" alt="Pet photo">
-          <div class="posted-badge">Listed on <span id="dm-posted"></span></div>
-        </div>
-        <div class="modal-info-col">
-          <div class="tags-row" id="dm-tags"></div>
-          <p id="dm-desc" class="pet-desc-text"></p>
-          
-          <div class="detail-grid">
-            <div class="detail-card">
-              <span class="lbl">Age</span>
-              <span class="val" id="dm-age"></span>
-            </div>
-            <div class="detail-card">
-              <span class="lbl">Gender</span>
-              <span class="val" id="dm-gender"></span>
-            </div>
-            <div class="detail-card">
-              <span class="lbl">Breed</span>
-              <span class="val" id="dm-breed"></span>
-            </div>
-            <div class="detail-card">
-              <span class="lbl">Location</span>
-              <span class="val" id="dm-loc"></span>
-            </div>
-          </div>
-
-          <div class="caregiver-card">
-            <h4>Contact Caregiver</h4>
-            <div class="cg-details">
-              <div class="cg-row"><span class="cg-lbl">Name</span><span id="dm-cg-name" class="cg-val">—</span></div>
-              <div class="cg-row"><span class="cg-lbl">Address</span><span id="dm-cg-address" class="cg-val">—</span></div>
-              <div class="cg-row">
-                <span class="cg-lbl">Phone</span>
-                <span class="cg-val">
-                  <button class="show-num-btn" id="showNumBtn">Show Number</button>
-                  <span id="dm-cg-phone" style="display:none;"></span>
-                </span>
-              </div>
-            </div>
-          </div>
-          
-          <button class="action-btn full-width" id="dm-adopt-btn">Contact Caregiver</button>
+          <button class="action-btn" id="detailsModalAdoptBtn">Adopt Me</button>
         </div>
       </div>
     </div>
   </div>
-</div>
 
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-
-<script src="app.js"></script>
-
+  <script src="app.js"></script>
 </body>
 </html>

@@ -44,17 +44,16 @@ const searchInput = document.getElementById('searchInput');
 const statCount = document.getElementById('statCount');
 const authNavBtn = document.getElementById('authNavBtn');
 const userGreeting = document.getElementById('userGreeting');
-const toastEl = document.getElementById('toast');
 const authModal = document.getElementById('authModal');
 const detailsModal = document.getElementById('detailsModal');
 const addPetForm = document.getElementById('addPetForm');
 const authForm = document.getElementById('authForm');
 const modalTitle = document.getElementById('modalTitle');
 const authSubmit = document.getElementById('authSubmit');
-const authToggleCtr = document.getElementById('authToggleCtr');
-const homeExtras = document.querySelectorAll('.home-extra');
+const authToggleCtr = document.querySelector('.auth-toggle');
+const homeExtras = document.querySelectorAll('.controls, .hero, .adopt-love-hero, .faq-section, .site-footer');
 const navBtns = document.querySelectorAll('.nav-btn');
-const filterBtns = document.querySelectorAll('.filter-btn');
+const filterBtns = document.querySelectorAll('.control-btn');
 
 // ── UTILITIES ─────────────────────────────────────────────────────────────────
 function todayStr() {
@@ -62,17 +61,18 @@ function todayStr() {
 }
 
 function showToast(msg) {
-  toastEl.textContent = msg;
-  toastEl.classList.add('show');
+  const toastMessage = document.getElementById('toastMessage');
+  if (!toastMessage) return;
+  toastMessage.textContent = msg;
+  toastMessage.classList.add('show');
   clearTimeout(showToast._t);
-  showToast._t = setTimeout(() => toastEl.classList.remove('show'), 3000);
+  showToast._t = setTimeout(() => toastMessage.classList.remove('show'), 3000);
 }
 
 function fallbackImg(name, type) {
-  // Swapped to soft blues/oranges to match the clean theme
-  const c = type === 'Cat' ? ['%23DBEAFE', '%23EFF6FF'] : ['%23FFEDD5', '%23FFF7ED'];
+  const c = type === 'Cat' ? ['%23a5d8ff', '%23dbeafe'] : ['%23ffe7c2', '%23fff3db'];
   const lbl = encodeURIComponent((name || 'Pet').slice(0, 2).toUpperCase());
-  return `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 420 300'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' x2='1' y1='0' y2='1'%3E%3Cstop offset='0' stop-color='${c[0]}'/%3E%3Cstop offset='1' stop-color='${c[1]}'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='420' height='300' rx='16' fill='url(%23g)'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Inter,sans-serif' font-size='100' fill='%236B7280' font-weight='700'%3E${lbl}%3C/text%3E%3C/svg%3E`;
+  return `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 420 300'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' x2='1' y1='0' y2='1'%3E%3Cstop offset='0' stop-color='${c[0]}'/%3E%3Cstop offset='1' stop-color='${c[1]}'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='420' height='300' rx='36' fill='url(%23g)'/%3E%3Ctext x='60' y='190' font-family='Inter,sans-serif' font-size='108' fill='%234c1d95' font-weight='800'%3E${lbl}%3C/text%3E%3C/svg%3E`;
 }
 
 // ── VIEW ROUTING ──────────────────────────────────────────────────────────────
@@ -80,7 +80,6 @@ function showView(view) {
   document.querySelectorAll('.page').forEach(p => p.classList.toggle('active', p.id === `view-${view}`));
   navBtns.forEach(b => b.classList.toggle('active', b.dataset.view === view));
   homeExtras.forEach(el => el.classList.toggle('hidden', view !== 'home'));
-  if (view === 'add-pet') addPetForm.reset();
 }
 
 // ── FIRESTORE: load pets ──────────────────────────────────────────────────────
@@ -96,7 +95,6 @@ async function loadPets() {
     renderCards();
   } catch (err) {
     console.error('Load pets error:', err);
-    // Fallback: use seed data locally if Firebase not configured
     if (allPets.length === 0) {
       allPets = SEED_PETS.map((p, i) => ({ id: String(i + 1), ...p }));
       updateBadges();
@@ -164,24 +162,23 @@ function openDetails(petId) {
   if (!pet) return;
   selectedPet = pet;
 
-  document.getElementById('dm-name').textContent = pet.name || 'Unnamed Pet';
-  const img = document.getElementById('dm-img');
+  document.getElementById('detailsModalName').textContent = pet.name || 'Unnamed Pet';
+  const img = document.getElementById('detailsModalImage');
   img.src = pet.imageUrl || fallbackImg(pet.name, pet.type);
   img.onerror = () => { img.src = fallbackImg(pet.name, pet.type); };
-  document.getElementById('dm-posted').textContent = pet.postedOn || todayStr();
-  document.getElementById('dm-tags').innerHTML = (pet.tags || []).map(t => `<span class="tag-pill">${t}</span>`).join('');
-  document.getElementById('dm-desc').textContent = pet.description || '';
-  document.getElementById('dm-age').textContent = pet.age || '—';
-  document.getElementById('dm-gender').textContent = pet.gender || '—';
-  document.getElementById('dm-breed').textContent = pet.breed || '—';
-  document.getElementById('dm-loc').textContent = pet.location || pet.caregiver?.address || '—';
+  document.getElementById('detailsPostedDate').textContent = pet.postedOn || todayStr();
+  document.getElementById('detailsModalBadges').innerHTML = (pet.tags || []).map(t => `<span class="pill">${t}</span>`).join('');
+  document.getElementById('detailsModalDescription').textContent = pet.description || '';
+  document.getElementById('detailsModalAge').textContent    = pet.age    || '—';
+  document.getElementById('detailsModalGender').textContent = pet.gender || '—';
+  document.getElementById('detailsModalBreed').textContent  = pet.breed  || '—';
 
   const cg = pet.caregiver || {};
-  document.getElementById('dm-cg-name').textContent = cg.name || '—';
-  document.getElementById('dm-cg-address').textContent = cg.address || '—';
-  const phoneSpan = document.getElementById('dm-cg-phone');
-  const showNumBtn = document.getElementById('showNumBtn');
-  phoneSpan.textContent = cg.phone || '—';
+  document.getElementById('caregiverModalName').textContent    = cg.name    || '—';
+  document.getElementById('caregiverModalAddress').textContent = cg.address || '—';
+  const phoneSpan   = document.getElementById('caregiverModalPhone');
+  const showNumBtn  = document.getElementById('showNumberBtn');
+  phoneSpan.textContent  = cg.phone || '—';
   phoneSpan.style.display = 'none';
   showNumBtn.style.display = 'inline';
 
@@ -192,13 +189,13 @@ function openDetails(petId) {
 function updateAuthUI() {
   if (currentUser) {
     authNavBtn.textContent = 'Logout';
-    authNavBtn.classList.add('out');
+    authNavBtn.classList.add('logged-in');
     const name = currentUser.displayName || currentUser.email.split('@')[0];
     userGreeting.textContent = `Hi, ${name} 👋`;
     userGreeting.classList.add('visible');
   } else {
     authNavBtn.textContent = 'Login';
-    authNavBtn.classList.remove('out');
+    authNavBtn.classList.remove('logged-in');
     userGreeting.classList.remove('visible');
   }
 }
@@ -219,8 +216,8 @@ function syncAuthModal() {
   authToggleCtr.innerHTML = isSignup
     ? `Already have an account? <a href="#" id="toggleAuthLink">Login</a>`
     : `Don't have an account? <a href="#" id="toggleAuthLink">Sign up</a>`;
-  document.getElementById('nameField').style.display = isSignup ? 'grid' : 'none';
-  document.getElementById('mobileField').style.display = isSignup ? 'grid' : 'none';
+  document.getElementById('signupNameField').style.display = isSignup ? 'grid' : 'none';
+  document.getElementById('signupMobileField').style.display = isSignup ? 'grid' : 'none';
 }
 
 async function handleAuth(e) {
@@ -290,7 +287,6 @@ async function handleAddPet(e) {
 
   try {
     let imageUrl = '';
-    // Base64 encode the image — no Firebase Storage needed (stays on free plan)
     if (imgFile) {
       imageUrl = await new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -339,7 +335,7 @@ petGrid.addEventListener('click', e => {
 searchInput.addEventListener('input', renderCards);
 
 document.querySelector('.filter-group').addEventListener('click', e => {
-  const btn = e.target.closest('.filter-btn[data-filter]');
+  const btn = e.target.closest('.control-btn[data-filter]');
   if (!btn) return;
   activeFilter = btn.dataset.filter;
   filterBtns.forEach(b => b.classList.toggle('active', b === btn));
@@ -380,15 +376,15 @@ document.getElementById('detailsModalClose').addEventListener('click', closeModa
 authModal.addEventListener('click', e => { if (e.target === authModal) closeModals(); });
 detailsModal.addEventListener('click', e => { if (e.target === detailsModal) closeModals(); });
 
-document.getElementById('showNumBtn').addEventListener('click', () => {
+document.getElementById('showNumberBtn').addEventListener('click', () => {
   if (!currentUser) { showToast('Please login to view contact details.'); openAuthModal(); return; }
-  document.getElementById('dm-cg-phone').style.display = 'inline';
-  document.getElementById('showNumBtn').style.display = 'none';
+  document.getElementById('caregiverModalPhone').style.display = 'inline';
+  document.getElementById('showNumberBtn').style.display = 'none';
 });
 
-document.getElementById('dm-adopt-btn').addEventListener('click', () => {
+document.getElementById('detailsModalAdoptBtn').addEventListener('click', () => {
   if (!currentUser) { showToast('Please login to contact the caregiver.'); openAuthModal(); return; }
-  document.getElementById('showNumBtn').click();
+  document.getElementById('showNumberBtn').click();
   showToast('📞 Scroll down to see the caregiver\'s number!');
 });
 
@@ -399,9 +395,9 @@ document.getElementById('adoptPetBtn').addEventListener('click', () => {
 document.querySelector('.faq-section').addEventListener('click', e => {
   const item = e.target.closest('.faq-item');
   if (!item) return;
-  const wasOpen = item.classList.contains('open');
-  document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
-  if (!wasOpen) item.classList.add('open');
+  const wasActive = item.classList.contains('active');
+  document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('active'));
+  if (!wasActive) item.classList.add('active');
 });
 
 addPetForm.addEventListener('submit', handleAddPet);
