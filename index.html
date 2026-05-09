@@ -91,7 +91,7 @@
       content: ''; position: absolute; top: -40px; right: -40px;
       width: 220px; height: 220px; background: rgba(92, 106, 196, 0.18); border-radius: 50%;
     }
-    .hero-image .hero-card img { width: 100%; height: 100%; object-fit: cover; border-radius: 28px; }
+    .hero-image .hero-card img { width: 100%; height: 100%; object-fit: contain; border-radius: 28px; }
 
     .controls { display: grid; gap: 18px; grid-template-columns: 1fr auto; margin-bottom: 24px; }
     .search-group { display: grid; position: relative; }
@@ -125,7 +125,7 @@
       overflow: hidden; transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
     .pet-card:hover { transform: translateY(-4px); box-shadow: 0 24px 50px rgba(54, 63, 146, 0.12); }
-    .pet-card img { width: 100%; height: 210px; object-fit: cover; }
+    .pet-card img { width: 100%; height: 210px; object-fit: contain; background-color: #f5f7fb; }
     .pet-card .card-body { padding: 20px; }
     .pet-card .pet-meta { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; color: var(--muted); font-size: 0.95rem; }
     .pet-card h2 { margin: 0 0 12px; font-size: 1.25rem; }
@@ -493,7 +493,7 @@
       </div>
       <div class="modal-body">
         <div id="detailsPostedBadge" class="posted-badge">📅 <span id="detailsPostedDate"></span></div>
-        <img id="detailsModalImage" alt="Selected pet image" style="width:100%;border-radius:20px;object-fit:cover;max-height:280px;margin-bottom:16px;">
+        <img id="detailsModalImage" alt="Selected pet image" style="width:100%;border-radius:20px;object-fit:contain;background-color:#f5f7fb;max-height:280px;margin-bottom:16px;">
         <div class="pet-detail-badge" id="detailsModalBadges"></div>
         <div class="note-banner" style="margin-top:14px;">
           <span>💚</span>
